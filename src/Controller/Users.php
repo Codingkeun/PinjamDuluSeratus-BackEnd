@@ -42,7 +42,7 @@ final class Users
         $result['id']           = $this->user->id;
         $result['email']        = $this->user->email;
         $result['fullname']     = $this->user->fullname;
-        $result['roles_id']     = $this->user->roles_id;        
+        $result['role']         = $this->user->role;        
         $result['logged_in']    = $this->user->logged_in;
         return JsonResponse:: withJson($response, $result, 200);
     }

@@ -162,7 +162,7 @@ final class AuthModel {
         return $jwt;
     }
 
-    public function validateToken($robot_invalidation = false) {
+    public function validateToken($robot_invalidation = true) {
         $result['status']       = false;
         $result['message']      = '';
         $result['data']         = new stdClass();
