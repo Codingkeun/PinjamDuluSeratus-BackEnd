@@ -1,206 +1,225 @@
 /*
-SQLyog Ultimate v13.1.1 (64 bit)
-MySQL - 10.4.18-MariaDB : Database - db_pinjamduluseratus
-*********************************************************************
+ Navicat Premium Data Transfer
+
+ Source Server         : Server Local
+ Source Server Type    : MySQL
+ Source Server Version : 100428
+ Source Host           : localhost:3306
+ Source Schema         : db_pinjamduluseratus
+
+ Target Server Type    : MySQL
+ Target Server Version : 100428
+ File Encoding         : 65001
+
+ Date: 21/11/2023 11:24:32
 */
 
-/*!40101 SET NAMES utf8 */;
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 
-/*!40101 SET SQL_MODE=''*/;
-
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`db_pinjamduluseratus` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-
-USE `db_pinjamduluseratus`;
-
-/*Table structure for table `investor` */
-
+-- ----------------------------
+-- Table structure for investor
+-- ----------------------------
 DROP TABLE IF EXISTS `investor`;
-
-CREATE TABLE `investor` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_user` int(11) DEFAULT NULL,
-  `npm` varchar(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `phone` varchar(15) DEFAULT NULL,
-  `faculty` varchar(255) NOT NULL,
-  `major` varchar(255) NOT NULL,
-  `class` varchar(255) NOT NULL,
-  `foto_ktm` varchar(255) NOT NULL,
-  `foto_selfie` varchar(255) NOT NULL,
-  `foto_profile` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_user` (`id_user`),
+CREATE TABLE `investor`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NULL DEFAULT NULL,
+  `npm` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `faculty` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `major` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `class` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `foto_ktm` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `foto_selfie` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `foto_profile` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `id_user`(`id_user` ASC) USING BTREE,
   CONSTRAINT `investor_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-/*Data for the table `investor` */
+-- ----------------------------
+-- Records of investor
+-- ----------------------------
 
-/*Table structure for table `peminjam` */
-
+-- ----------------------------
+-- Table structure for peminjam
+-- ----------------------------
 DROP TABLE IF EXISTS `peminjam`;
-
-CREATE TABLE `peminjam` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_user` int(11) DEFAULT NULL,
-  `npm` varchar(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `phone` varchar(15) DEFAULT NULL,
-  `faculty` varchar(255) NOT NULL,
-  `major` varchar(255) NOT NULL,
-  `class` varchar(255) NOT NULL,
-  `foto_ktm` varchar(255) NOT NULL,
-  `foto_selfie` varchar(255) NOT NULL,
-  `foto_profile` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_user` (`id_user`),
+CREATE TABLE `peminjam`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NULL DEFAULT NULL,
+  `npm` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `faculty` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `major` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `class` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `foto_ktm` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `foto_selfie` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `foto_profile` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `id_user`(`id_user` ASC) USING BTREE,
   CONSTRAINT `peminjam_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-/*Data for the table `peminjam` */
+-- ----------------------------
+-- Records of peminjam
+-- ----------------------------
+INSERT INTO `peminjam` VALUES (1, 1, '10292012', 'Cecep Rokani', '087172817231', 'Informatika', 'Teknik Informatika', 'TIF 222 MB', 'googl.com', 'google.com', 'gogle.com', '2023-11-21 11:16:09', NULL);
 
-/*Table structure for table `request_pinjaman` */
-
+-- ----------------------------
+-- Table structure for request_pinjaman
+-- ----------------------------
 DROP TABLE IF EXISTS `request_pinjaman`;
-
-CREATE TABLE `request_pinjaman` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_peminjam` int(11) NOT NULL,
-  `id_investor` int(11) NOT NULL,
-  `nominal` int(10) NOT NULL,
-  `tip` int(10) NOT NULL,
-  `instalment_nominal` int(10) DEFAULT NULL,
-  `instalment_total` int(10) DEFAULT NULL,
-  `instalment_status` enum('belum','pending','lunas','gagal') DEFAULT NULL,
+CREATE TABLE `request_pinjaman`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_peminjam` int NOT NULL,
+  `id_investor` int NOT NULL,
+  `nominal` int NOT NULL,
+  `tip` int NOT NULL,
+  `instalment_nominal` int NULL DEFAULT NULL,
+  `instalment_total` int NULL DEFAULT NULL,
+  `instalment_status` enum('belum','pending','lunas','gagal') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `deadline` datetime NOT NULL,
-  `description` text DEFAULT NULL,
-  `status_approval` enum('wait','approve') DEFAULT NULL,
-  `bank_name` varchar(20) DEFAULT NULL,
-  `account_number` varchar(20) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_peminjam` (`id_peminjam`),
-  KEY `id_investor` (`id_investor`),
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `status_approval` enum('wait','approve') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `bank_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `account_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `id_peminjam`(`id_peminjam` ASC) USING BTREE,
+  INDEX `id_investor`(`id_investor` ASC) USING BTREE,
   CONSTRAINT `request_pinjaman_ibfk_1` FOREIGN KEY (`id_peminjam`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `request_pinjaman_ibfk_2` FOREIGN KEY (`id_investor`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-/*Data for the table `request_pinjaman` */
+-- ----------------------------
+-- Records of request_pinjaman
+-- ----------------------------
 
-/*Table structure for table `request_pinjaman_cicilan` */
-
+-- ----------------------------
+-- Table structure for request_pinjaman_cicilan
+-- ----------------------------
 DROP TABLE IF EXISTS `request_pinjaman_cicilan`;
-
-CREATE TABLE `request_pinjaman_cicilan` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_request_pinjaman` int(11) NOT NULL,
+CREATE TABLE `request_pinjaman_cicilan`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_request_pinjaman` int NOT NULL,
   `date` date NOT NULL,
-  `nominal` int(10) NOT NULL,
-  `status` enum('belum','pending','lunas') DEFAULT NULL,
-  `attachment` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_request_pinjaman` (`id_request_pinjaman`),
+  `nominal` int NOT NULL,
+  `status` enum('belum','pending','lunas') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `attachment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `id_request_pinjaman`(`id_request_pinjaman` ASC) USING BTREE,
   CONSTRAINT `request_pinjaman_cicilan_ibfk_1` FOREIGN KEY (`id_request_pinjaman`) REFERENCES `request_pinjaman` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-/*Data for the table `request_pinjaman_cicilan` */
+-- ----------------------------
+-- Records of request_pinjaman_cicilan
+-- ----------------------------
 
-/*Table structure for table `saldo_investor` */
-
+-- ----------------------------
+-- Table structure for saldo_investor
+-- ----------------------------
 DROP TABLE IF EXISTS `saldo_investor`;
+CREATE TABLE `saldo_investor`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_investor` int NOT NULL,
+  `nominal` int NOT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-CREATE TABLE `saldo_investor` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_investor` int(11) NOT NULL,
-  `nominal` int(10) NOT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- ----------------------------
+-- Records of saldo_investor
+-- ----------------------------
 
-/*Data for the table `saldo_investor` */
-
-/*Table structure for table `saldo_sedekah` */
-
+-- ----------------------------
+-- Table structure for saldo_sedekah
+-- ----------------------------
 DROP TABLE IF EXISTS `saldo_sedekah`;
+CREATE TABLE `saldo_sedekah`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `nominal` int NOT NULL,
+  `siklus` enum('masuk','keluar') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `status` enum('wait','success') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `attachment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-CREATE TABLE `saldo_sedekah` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL,
-  `nominal` int(10) NOT NULL,
-  `siklus` enum('masuk','keluar') NOT NULL,
-  `description` text DEFAULT NULL,
-  `status` enum('wait','success') DEFAULT NULL,
-  `attachment` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- ----------------------------
+-- Records of saldo_sedekah
+-- ----------------------------
 
-/*Data for the table `saldo_sedekah` */
-
-/*Table structure for table `transaction` */
-
+-- ----------------------------
+-- Table structure for transaction
+-- ----------------------------
 DROP TABLE IF EXISTS `transaction`;
-
-CREATE TABLE `transaction` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_investor` int(11) NOT NULL,
-  `nominal` int(10) NOT NULL,
-  `siklus` enum('masuk','keluar') NOT NULL,
-  `description` text DEFAULT NULL,
-  `status` enum('wait','success') NOT NULL,
-  `attachment` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_investor` (`id_investor`),
+CREATE TABLE `transaction`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_investor` int NOT NULL,
+  `nominal` int NOT NULL,
+  `siklus` enum('masuk','keluar') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `status` enum('wait','success') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `attachment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `id_investor`(`id_investor` ASC) USING BTREE,
   CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`id_investor`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-/*Data for the table `transaction` */
+-- ----------------------------
+-- Records of transaction
+-- ----------------------------
 
-/*Table structure for table `univ_profile` */
-
+-- ----------------------------
+-- Table structure for univ_profile
+-- ----------------------------
 DROP TABLE IF EXISTS `univ_profile`;
+CREATE TABLE `univ_profile`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `logo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-CREATE TABLE `univ_profile` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `logo` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- ----------------------------
+-- Records of univ_profile
+-- ----------------------------
 
-/*Data for the table `univ_profile` */
-
-/*Table structure for table `users` */
-
+-- ----------------------------
+-- Table structure for users
+-- ----------------------------
 DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `role` enum('peminjam','investor') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `last_login` datetime NULL DEFAULT NULL,
+  `created_at` datetime NULL DEFAULT NULL,
+  `updated_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) DEFAULT NULL,
-  `role` enum('peminjam','investor') NOT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- ----------------------------
+-- Records of users
+-- ----------------------------
+INSERT INTO `users` VALUES (1, 'ceceprokani@gmail.com', '$2y$10$AQA7/GJoYOTpQw8Zx2yM1u0iigGkFMBg1HCjgt8jU3D9foc.naE1q', 'peminjam', '2023-11-21 11:17:23', '2023-11-21 11:15:39', NULL);
 
-/*Data for the table `users` */
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+SET FOREIGN_KEY_CHECKS = 1;
