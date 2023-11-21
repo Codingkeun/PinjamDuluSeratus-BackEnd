@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Helper\JsonResponse;
+use App\Helper\General;
 use Pimple\Psr11\Container;
-use App\Model\GeneralModel;
 use App\Model\FileModel;
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -25,7 +25,7 @@ final class Uploader
     public function __construct(Container $container)
     {
         $this->container    = $container;
-        $this->general      = new GeneralModel($this->container->get('db'));
+        $this->general      = new General($container);
         $this->file         = new FileModel($this->container->get('db'));
     }
 

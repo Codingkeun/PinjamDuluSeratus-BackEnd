@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Helper\JsonResponse;
+use App\Helper\General;
 use App\Model\AuthModel;
 use Pimple\Psr11\Container;
-use App\Model\GeneralModel;
 use App\Model\LogModel;
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -27,7 +27,7 @@ final class Auth
     {
         $this->container    = $container;
         $this->authModel    = new AuthModel($this->container->get('db'));
-        $this->general      = new GeneralModel($this->container->get('db'));
+        $this->general      = new General($container);
         $this->log          = new LogModel($this->container->get('db'));
     }
 

@@ -24,7 +24,6 @@ final class AuthModel {
 
     public function __construct(\Pecee\Pixie\Connection $database) {
         $this->database       = $database;
-        $this->general        = new GeneralModel($this->database);
         $this->secretKey      = "KE3FEoguF3Meijyijb27qYf4HlSeSMM6";
         $this->secretPassword = "Rahasia@2022";
 
@@ -53,12 +52,14 @@ final class AuthModel {
 
             if(empty($getUser->id)) {
                 $message    = "User tidak ditemukan";
-            }
-            else {
+            } else {
                 $isAllow    = true;
             }
 
             if($isAllow) {
+                // get detail information of user
+                $detailUser = $this->db()->table($getUser->role)->where('id_user', $getUser->id)->first();
+
                 // check if using newer hash (general user)
                 if (password_verify($password, $getUser->password)) {
                     $loginstatus = true;
@@ -83,18 +84,18 @@ final class AuthModel {
                         $update_data['password'] = password_hash($password, PASSWORD_BCRYPT);
                     }
 
-                    $getUser->fullname = $getUser->first_name.' '.$getUser->last_name;
-                    $token  = $this->generateToken($getUser->id, $getUser->email, $getUser->fullname, $getUser->roles_id);
+                    $getUser->fullname = $detailUser->name;
+                    $token  = $this->generateToken($getUser->id, $getUser->email, $getUser->fullname, $getUser->role);
                     // Update users
                     $this->db()->table('users')->where('id', $getUser->id)->update($update_data);
                     $message        = "Login berhasil";
                     $data_users['key']  = $token;
                     $result['user']     = $data_users;
 
-                    $this->recordLoginAttempt($getUser->id, $loginmethod, "success", "signin");
+                    // $this->recordLoginAttempt($getUser->id, $loginmethod, "success", "signin");
                 } else {
                     $message = "Password yang dimasukan salah";
-                    $this->recordLoginAttempt($getUser->id, $loginmethod, "wrong_password", "signin");
+                    // $this->recordLoginAttempt($getUser->id, $loginmethod, "wrong_password", "signin");
                 }
             }
         }
@@ -142,10 +143,10 @@ final class AuthModel {
         return $result;
     }
         
-    public function generateToken($id = "", $email = "", $name = "", $roles_id = "") {
+    public function generateToken($id = "", $email = "", $name = "", $role = "") {
         $key = $this->secretKey;
         $payload = array(
-            "iss" => "https://scola.id/",
+            "iss" => "https://oeltimacreation.com/",
             "aud" => "Ub71Of8Vlg",
             "iat" => time(),
             "exp" => time() + (3600*24), // Token berlaku selama 24 jam
@@ -153,7 +154,7 @@ final class AuthModel {
                 "id"        => $id,
                 "email"     => $email,
                 "fullname"  => $name,
-                "roles_id"   => $roles_id
+                "role"      => $role
             )
         );
         
@@ -196,7 +197,7 @@ final class AuthModel {
             $result['data']->id         = $decoded->data->id;
             $result['data']->email      = $decoded->data->email;
             $result['data']->fullname   = $decoded->data->fullname;
-            $result['data']->roles_id    = $decoded->data->roles_id;
+            $result['data']->role       = $decoded->data->role;
             $result['data']->logged_in  = true;
 
             if ($result['status']) {
