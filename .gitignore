@@ -1,4 +1,5 @@
 /vendor/
+/public/uploads/
 /logs/*
 !/logs/README.md
 /coverage/
@@ -9,3 +10,4 @@
 /.env
 /.scannerwork/
 /.phpunit.result.cache
+/storage

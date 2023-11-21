@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+/*
+ * Hello
+ * Author : Cecep Rokani
+*/
+
 namespace App\Controller;
 
 use App\Helper\JsonResponse;
@@ -32,8 +37,8 @@ final class Hello
     {
         $this->hellomodel = new HelloModel();
 
-        $result['status'] = true;
-        $result['message'] = $this->hellomodel->getHello();
+        $result['status']   = true;
+        $result['message']  = $this->hellomodel->getHello();
 
         return JsonResponse::withJson($response, $result, 200);
     }
