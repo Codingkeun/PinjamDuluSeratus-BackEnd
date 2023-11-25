@@ -32,7 +32,7 @@ host('development')
     ->stage('dev')
     ->port(22)
     ->user('ubuntu')
-    ->set('branch', 'master')
+    ->set('branch', 'main')
     ->set('deploy_path', '/var/www/oeltimacreation/apps/pinjamdulustatus-api');
 
 
