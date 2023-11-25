@@ -1,0 +1,22 @@
+name: Deploy Development
+
+on: 
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    name: Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 8.0
+      - name: Deploy
+        uses: deployphp/action@v1.0.17
+        with:
+          private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          dep: deploy development -vvv
