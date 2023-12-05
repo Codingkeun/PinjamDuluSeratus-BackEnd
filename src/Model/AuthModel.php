@@ -33,7 +33,7 @@ final class AuthModel {
         }        
     }
 
-    public function processLogin($email="", $password="")
+    public function processLogin($email="", $password="", $role="")
     {
         $isAllow     = false;
         $updatehash  = false;
@@ -47,6 +47,7 @@ final class AuthModel {
             $getData = $this->db()->table('users');
             $getData->select($getData->raw('users.*'));
             $getData->where("email","=",$email);
+            $getData->where("role","=",$role);
 
             $getUser    = $getData->first();
 

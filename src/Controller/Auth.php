@@ -39,7 +39,8 @@ final class Auth
         $post           = $request->getParsedBody();        
         $email          = isset($post["email"]) ? $post["email"] :'';
         $password       = isset($post["password"]) ? $post["password"] :'';
-        $data           = $this->authModel->processLogin($email, $password);
+        $role           = isset($post["role"]) ? $post["role"] :'';
+        $data           = $this->authModel->processLogin($email, $password, $role);
 
         $result['status']  = $data['status'];
         $result['message'] = $data['message'];
