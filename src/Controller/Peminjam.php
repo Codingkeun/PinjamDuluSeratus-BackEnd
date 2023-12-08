@@ -49,11 +49,12 @@ final class Peminjam
         $data['account_number']    = isset($post["account_number"]) ? $post["account_number"] :'';
 
         // SIMULASI CICILAN
-        $simNilaiCicilan  = ceil($data['nominal']/$data['jml_cicilan']);
+        $simNilaiCicilan  = ceil(($post['nominal']+$post['tip'])/$post['jml_cicilan']);
 
         $data['instalment_nominal']  = $simNilaiCicilan;
         $data['instalment_status']   = 'belum';
-        $data['deadline']            = date('Y-m-d H:i:s', strtotime('+'.$data['jml_cicilan']. ' month', strtotime(date("Y-m-d H:i:s"))));
+        $data['deadline']            = date('Y-m-d H:i:s', strtotime('+'.$post['jml_cicilan']. ' month', strtotime(date("Y-m-d H:i:s"))));
+        $idPinjaman = $this->generalModel->insert("request_pinjaman", $data);
 
         for($i=1;$i<=$post['jml_cicilan'];$i++){
             $param['id_request_pinjaman'] = $idPinjaman;
@@ -65,7 +66,7 @@ final class Peminjam
         }
         // SIMULASI CICILAN
 
-        if($prosesData){
+        if($idPinjaman){
             $result['status']  = true;
             $result['message'] = 'Pengajuan Berhasil di Proses';
         }
