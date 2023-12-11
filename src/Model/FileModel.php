@@ -20,7 +20,7 @@ final class FileModel {
 
     public function __construct(\Pecee\Pixie\Connection $database) {
         $this->database     = $database;
-        $this->directory    = __DIR__ . '/../../public/uploads';
+        $this->directory    = __DIR__ . '/../../public/assets';
     }
 
     public function validateFile($source_file, $target_folder, $randomize_filename = false)
@@ -67,6 +67,6 @@ final class FileModel {
     
         $uploadedFile->moveTo($this->directory . DIRECTORY_SEPARATOR . $filename);
     
-        return 'uploads/'.$filename;
+        return 'assets/'.$filename;
     }    
 }
