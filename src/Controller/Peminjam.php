@@ -53,6 +53,7 @@ final class Peminjam
 
         $data['instalment_nominal']  = $simNilaiCicilan;
         $data['instalment_status']   = 'belum';
+        $data['status_approval']     = 'wait';
         $data['deadline']            = date('Y-m-d H:i:s', strtotime('+'.$post['jml_cicilan']. ' month', strtotime(date("Y-m-d H:i:s"))));
         $idPinjaman = $this->generalModel->insert("request_pinjaman", $data);
 
