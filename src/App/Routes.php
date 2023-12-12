@@ -14,7 +14,7 @@ $app->post('/donasi', 'App\Controller\Umum:donasi');
 
 // Peminjam Routes
 $app->post('/pinjaman/ajukan-pinjaman', 'App\Controller\Peminjam:ajukanPinjaman');
-$app->get('/pinjaman/tagihan-aktif', 'App\Controller\Peminjam:index'); 
+$app->get('/pinjaman/pinjaman-aktif', 'App\Controller\Peminjam:index'); 
 $app->get('/pinjaman/detail/{id}', 'App\Controller\Peminjam:detail'); 
 
 // User Routes
