@@ -17,6 +17,7 @@ use Pimple\Psr11\Container;
 use App\Model\AccountModel;
 use App\Model\LogModel;
 use App\Model\FileModel;
+use App\Model\PinjamanModel;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -33,7 +34,39 @@ final class Peminjam
         $this->general      = new General($container);
         $this->log          = new LogModel($this->container->get('db'));
         $this->file         = new FileModel($this->container->get('db'));
+        $this->pinjaman     = new PinjamanModel($this->container);
         $this->user         = $this->auth->validateToken();
+    }
+
+    public function index(Request $request, Response $response): Response
+    {
+        $params = $request->getQueryParams();
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan', 'data' => array()];
+        $params['user_id'] = $this->user->id;
+        $list   = $this->pinjaman->list($params);
+
+        if (!empty($list['data'])) {
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $list['data']];
+        }
+
+        $result['pagination'] = [
+            'page' => (int) $params['page'],
+            'prev' => $params['page'] > 1,
+            'next' => ($list['total'] - ($params['page'] * $params['limit'])) > 0,
+            'total' => $list['total']
+        ];
+        return JsonResponse::withJson($response, $result, 200);
+    }
+
+    public function detail(Request $request, Response $response, $parameters): Response
+    {
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan'];
+        $detail = (array) $this->pinjaman->detail($parameters['id']);
+
+        if (!empty($detail)) {
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $detail];
+        }
+        return JsonResponse::withJson($response, $result, 200);
     }
 
     public function ajukanPinjaman(Request $request, Response $response): Response
