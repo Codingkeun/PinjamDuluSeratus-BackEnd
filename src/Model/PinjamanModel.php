@@ -55,6 +55,30 @@ final class PinjamanModel extends BaseModel
         return ['data' => $list, 'total' => $totalData];
     }
 
+    public function buildQueryListRiwayatPinjaman($params) {
+        $getQuery = $this->db()->table('request_pinjaman_cicilan')
+                            ->where('id_request_pinjaman', $params['pinjaman_id'])
+                            ->orderBy('date', 'ASC');
+
+        return $getQuery;
+    }
+
+    public function listRiwayatPembayaran($params=null) {
+        $getQuery = $this->buildQueryListRiwayatPinjaman($params);
+        
+        $totalData = $getQuery->count();
+
+        if (!empty($params['page'])) {
+            $page = $params['page'] == 1 ? $params['page'] - 1 : ($params['page'] * $params['limit']) - $params['limit'];
+
+            $getQuery->limit((int) $params['limit']);
+            $getQuery->offset((int) $page);
+        }
+        
+        $list = $getQuery->get();
+        return ['data' => $list, 'total' => $totalData];
+    }
+
     public function detail($id) {
         $result = $this->db()->table('request_pinjaman')
                 ->where('id', $id)->first();

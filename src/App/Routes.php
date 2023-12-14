@@ -14,8 +14,9 @@ $app->post('/donasi', 'App\Controller\Umum:donasi');
 
 // Peminjam Routes
 $app->post('/pinjaman/ajukan-pinjaman', 'App\Controller\Peminjam:ajukanPinjaman');
-$app->get('/pinjaman/pinjaman-aktif', 'App\Controller\Peminjam:index'); 
+$app->get('/pinjaman/pinjaman-aktif', 'App\Controller\Peminjam:listPinjamanaAktif'); 
 $app->get('/pinjaman/detail/{id}', 'App\Controller\Peminjam:detail'); 
+$app->get('/pinjaman/riwayat', 'App\Controller\Peminjam:riwayatPinjaman'); 
 
 // User Routes
 $app->get('/users/info', 'App\Controller\Users:info');

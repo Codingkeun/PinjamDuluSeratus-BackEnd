@@ -38,7 +38,7 @@ final class Peminjam
         $this->user         = $this->auth->validateToken();
     }
 
-    public function index(Request $request, Response $response): Response
+    public function listPinjamanaAktif(Request $request, Response $response): Response
     {
         $params = $request->getQueryParams();
         $result = ['status' => false, 'message' => 'Data tidak ditemukan', 'data' => array()];
@@ -66,6 +66,26 @@ final class Peminjam
         if (!empty($detail)) {
             $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $detail];
         }
+        return JsonResponse::withJson($response, $result, 200);
+    }
+
+    public function riwayatPinjaman(Request $request, Response $response): Response
+    {
+        $params = $request->getQueryParams();
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan', 'data' => array()];
+        $params['user_id'] = $this->user->id;
+        $list   = $this->pinjaman->listRiwayatPembayaran($params);
+
+        if (!empty($list['data'])) {
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $list['data']];
+        }
+
+        $result['pagination'] = [
+            'page' => (int) $params['page'],
+            'prev' => $params['page'] > 1,
+            'next' => ($list['total'] - ($params['page'] * $params['limit'])) > 0,
+            'total' => $list['total']
+        ];
         return JsonResponse::withJson($response, $result, 200);
     }
 
