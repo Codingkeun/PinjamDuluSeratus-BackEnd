@@ -195,6 +195,11 @@ final class General {
         
         return $baseUrl.''.$extended_url;
     }
+
+    public function millisecsBetween($dateOne, $dateTwo, $abs = true) {
+        $func = $abs ? 'abs' : 'intval';
+        return $func(strtotime($dateOne) - strtotime($dateTwo)) * 1000;
+    }
 }
 
 ?>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Pimple\Psr11\Container;
+use App\Helper\General;
 
 /**
  * PinjamanModel class
@@ -13,6 +14,8 @@ final class PinjamanModel extends BaseModel
 {
     public function __construct(Container $container) {
         $this->container    = $container;
+
+        $this->general      = new General($container);
 
         parent::__construct();
     }
@@ -53,7 +56,24 @@ final class PinjamanModel extends BaseModel
     }
 
     public function detail($id) {
-        return $this->db()->table('request_pinjaman')
+        $result = $this->db()->table('request_pinjaman')
                 ->where('id', $id)->first();
+
+        if (!empty($result)) {
+            $totalTrxPaid = $this->db()->table('request_pinjaman_cicilan')
+                                    ->where('id_request_pinjaman', $id)
+                                    ->where('status', '!=', 'belum')
+                                    ->orderBy('id', 'asc')
+                                    ->count();
+            $getInvestor = $this->db()->table('transaction')
+                                    ->select($this->db()->raw('investor.name'))
+                                    ->join('investor', 'investor.id', '=', 'transaction.id_investor')
+                                    ->first();
+            $result->investor = $getInvestor;
+            $result->count_payment = $totalTrxPaid + 1;
+            $result->time_remaining_in_millisecond = $this->general->millisecsBetween($result->deadline, date('Y-m-d H:i:s'));
+        }
+
+        return $result;
     }
 }
