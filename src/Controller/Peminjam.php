@@ -38,6 +38,31 @@ final class Peminjam
         $this->user         = $this->auth->validateToken();
     }
 
+    public function statisticDashboard(Request $request, Response $response): Response
+    {
+        $params = $request->getQueryParams();
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan', 'data' => array()];
+        $params['user_id'] = $this->user->id;
+        $params['sort'] = 'request_pinjaman.created_at###asc';
+        $list   = $this->pinjaman->list($params);
+
+        if (!empty($list['data'])) {
+            $statisticLoanMonth = [];
+            foreach ($list['data'] as $trx) {
+                $date = date('Y-m-d', strtotime($trx->created_at));
+
+                if (!isset($statisticLoanMonth[$date]))
+                    $statisticLoanMonth[$date] = 0;
+                $statisticLoanMonth[$date] += $trx->nominal;
+            }
+
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => [
+                'statistic_loan_month' => array_values($statisticLoanMonth)
+            ]];
+        }
+        return JsonResponse::withJson($response, $result, 200);
+    }
+
     public function listPinjamanaAktif(Request $request, Response $response): Response
     {
         $params = $request->getQueryParams();
@@ -108,6 +133,7 @@ final class Peminjam
         $data['instalment_status']   = 'belum';
         $data['status_approval']     = 'wait';
         $data['deadline']            = date('Y-m-d H:i:s', strtotime('+'.$post['jml_cicilan']. ' month', strtotime(date("Y-m-d H:i:s"))));
+        $data['created_at']          = date('Y-m-d H:i:s');
         $idPinjaman = $this->generalModel->insert("request_pinjaman", $data);
 
         for($i=1;$i<=$post['jml_cicilan'];$i++){

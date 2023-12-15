@@ -27,13 +27,20 @@ final class PinjamanModel extends BaseModel
         $getQuery->leftJoin('investor', 'investor.id', '=', 'transaction.id_investor');
         $getQuery->where('request_pinjaman.id_peminjam', $params['user_id']);
         $getQuery->groupBy('request_pinjaman.id');
-        $getQuery->orderBy('request_pinjaman.deadline', 'asc');
 
         if(!empty($params['keywords'])) {
             $keywords = $params['keywords'];
             $getQuery->where('investor.name', 'LIKE', "%$keywords%");
         } if (!empty($params['status'])) {
             $getQuery->where('request_pinjaman.instalment_status', $params['status']);
+        } if (!empty($params['status_approval'])) {
+            $getQuery->where('request_pinjaman.status_approval', $params['status_approval']);
+        } if (!empty($params['sort'])) {
+            $tmpSort = explode('###', $params['sort']);
+            
+            $getQuery->orderBy($tmpSort[0], $tmpSort[1]);
+        } if (empty($params['sort'])) {
+            $getQuery->orderBy('request_pinjaman.deadline', 'asc');
         }
 
         return $getQuery;

@@ -14,6 +14,7 @@ $app->post('/auth/signup', 'App\Controller\Auth:signup');
 $app->post('/donasi', 'App\Controller\Umum:donasi');
 
 // Peminjam Routes
+$app->get('/pinjaman/dashboard/statistic', 'App\Controller\Peminjam:statisticDashboard'); 
 $app->post('/pinjaman/ajukan-pinjaman', 'App\Controller\Peminjam:ajukanPinjaman');
 $app->get('/pinjaman/pinjaman-aktif', 'App\Controller\Peminjam:listPinjamanaAktif'); 
 $app->get('/pinjaman/detail/{id}', 'App\Controller\Peminjam:detail'); 
