@@ -135,41 +135,51 @@ final class Peminjam
         
         $post              = $request->getParsedBody();
 
-        $allowSubmit = true;
-        $data   = [
-            'status' => 'lunas',
-            'date_payment' => date('Y-m-d H:i:s'),
-            'payment_method_id' => $post['payment_method_id']
-        ];
+        $detailTrx = $this->generalModel->fetchBy($post['trx_id'], 'request_pinjaman_cicilan');
 
-        if (isset($_FILES['attachment']) && $_FILES['attachment']['size'] != 0) {
-            $targetFolder   = "/payment/" . $this->user->role;
-            $validateFile   = $this->file->validateFile('attachment', $targetFolder, true);
-
-            if ($validateFile['status']) {
-                $allowed_extension = array('png','jpg');
-                if (in_array($validateFile['extension'], $allowed_extension)) {
-                    $uploadedFiles  = $request->getUploadedFiles();
-                    $uploadedFile   = $uploadedFiles['attachment'];
-
-                    if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-                        $filename       = $this->file->moveUploadedFile($uploadedFile, 'attachment');
-                        $url_upload     = $this->general->baseUrl($filename);
-
-                        $data["attachment"]    = $url_upload;
+        if (!empty($detailTrx)) {
+            $allowSubmit = true;
+            $data   = [
+                'status' => 'lunas',
+                'date_payment' => date('Y-m-d H:i:s'),
+                'payment_method_id' => $post['payment_method_id']
+            ];
+    
+            if (isset($_FILES['attachment']) && $_FILES['attachment']['size'] != 0) {
+                $targetFolder   = "/payment/" . $this->user->role;
+                $validateFile   = $this->file->validateFile('attachment', $targetFolder, true);
+    
+                if ($validateFile['status']) {
+                    $allowed_extension = array('png','jpg');
+                    if (in_array($validateFile['extension'], $allowed_extension)) {
+                        $uploadedFiles  = $request->getUploadedFiles();
+                        $uploadedFile   = $uploadedFiles['attachment'];
+    
+                        if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+                            $filename       = $this->file->moveUploadedFile($uploadedFile, 'attachment');
+                            $url_upload     = $this->general->baseUrl($filename);
+    
+                            $data["attachment"]    = $url_upload;
+                        }
+                    } else {
+                        $allowSubmit = false;
+                        $result['error']        = "File yang diupload harus gambar (.png / .jpg)";
                     }
-                } else {
-                    $allowSubmit = false;
-                    $result['error']        = "File yang diupload harus gambar (.png / .jpg)";
                 }
             }
-        }
-
-        if ($allowSubmit) {
-            $prosesData = $this->generalModel->update($post["trx_id"], 'request_pinjaman_cicilan', $data);
-            if($prosesData){
-                $result['status']  = true;
-                $result['message'] = 'Pembayaran berhasil dilakukan';
+    
+            if ($allowSubmit) {
+                $prosesData = $this->generalModel->update($post["trx_id"], 'request_pinjaman_cicilan', $data);
+                if($prosesData){
+                    $result['status']  = true;
+                    $result['message'] = 'Pembayaran berhasil dilakukan';
+                    
+                    $currUnpaid = $this->pinjaman->getListTrxUnpaid($detailTrx->id_request_pinjaman);
+                    // flag the parent data if all tenor is paid
+                    if (empty($currUnpaid)) {
+                        $this->generalModel->update($detailTrx->id_request_pinjaman, 'request_pinjaman', ['instalment_status' => 'lunas']);
+                    }
+                }
             }
         }
         

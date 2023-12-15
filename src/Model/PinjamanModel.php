@@ -90,12 +90,8 @@ final class PinjamanModel extends BaseModel
                                     ->where('id_request_pinjaman', $id)
                                     ->where('status', '!=', 'belum')
                                     ->orderBy('id', 'asc')
-                                    ->count();
-            $trxUnPaid = $this->db()->table('request_pinjaman_cicilan')
-                                    ->where('id_request_pinjaman', $id)
-                                    ->where('status', '=', 'belum')
-                                    ->orderBy('id', 'asc')
-                                    ->first();
+                                    ->count();;
+            $trxUnPaid = $this->getListTrxUnpaid($id);
             $getInvestor = $this->db()->table('transaction')
                                     ->select($this->db()->raw('investor.name'))
                                     ->join('investor', 'investor.id', '=', 'transaction.id_investor')
@@ -109,5 +105,13 @@ final class PinjamanModel extends BaseModel
         }
 
         return $result;
+    }
+
+    public function getListTrxUnpaid($pinjamanId) {
+        return $this->db()->table('request_pinjaman_cicilan')
+                ->where('id_request_pinjaman', $pinjamanId)
+                ->where('status', '=', 'belum')
+                ->orderBy('id', 'asc')
+                ->first();
     }
 }
