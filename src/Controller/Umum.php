@@ -110,4 +110,15 @@ final class Umum
         $result['total_page']  = $totalAllPage;
         return JsonResponse:: withJson($response, json_encode($result), 200);
     }
+
+    public function listBank(Request $request, Response $response): Response {
+        $list = $this->generalModel->fetchWhere(['enabled' => '1'], 'payment_method');
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan'];
+
+        if (!empty($list)) {
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $list];
+        }
+        
+        return JsonResponse:: withJson($response, $result, 200);
+    }
 }

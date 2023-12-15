@@ -80,6 +80,8 @@ final class PinjamanModel extends BaseModel
     }
 
     public function detail($id) {
+        $numberString = ['', 'Pertama', 'Kedua', 'Ketiga', 'Keempat', 'Kelima', 'Keenam', 'Ketujuh',
+                        'Kedelapan', 'Kesembilan', 'Kesepuluh', 'Kesebelas', 'Keduabelas'];
         $result = $this->db()->table('request_pinjaman')
                 ->where('id', $id)->first();
 
@@ -89,12 +91,20 @@ final class PinjamanModel extends BaseModel
                                     ->where('status', '!=', 'belum')
                                     ->orderBy('id', 'asc')
                                     ->count();
+            $trxUnPaid = $this->db()->table('request_pinjaman_cicilan')
+                                    ->where('id_request_pinjaman', $id)
+                                    ->where('status', '=', 'belum')
+                                    ->orderBy('id', 'asc')
+                                    ->first();
             $getInvestor = $this->db()->table('transaction')
                                     ->select($this->db()->raw('investor.name'))
                                     ->join('investor', 'investor.id', '=', 'transaction.id_investor')
                                     ->first();
+
             $result->investor = $getInvestor;
             $result->count_payment = $totalTrxPaid + 1;
+            $result->trx_unpaid = $trxUnPaid;
+            $result->count_payment_string = $numberString[$result->count_payment];
             $result->time_remaining_in_millisecond = $this->general->millisecsBetween($result->deadline, date('Y-m-d H:i:s'));
         }
 
