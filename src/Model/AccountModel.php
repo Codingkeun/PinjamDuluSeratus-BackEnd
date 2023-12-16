@@ -8,16 +8,13 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-final class AccountModel {
-    protected $database;
+use Pimple\Psr11\Container;
 
-    protected function db() {
-        $pdo = new \Pecee\Pixie\QueryBuilder\QueryBuilderHandler($this->database);
-        return $pdo;
-    }
+final class AccountModel extends BaseModel {
+    public function __construct(Container $container) {
+        $this->container    = $container;
 
-    public function __construct(\Pecee\Pixie\Connection $database) {
-        $this->database = $database;
+        parent::__construct();
     }
 
     public function detail($id="") {

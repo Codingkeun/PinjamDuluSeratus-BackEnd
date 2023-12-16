@@ -32,3 +32,4 @@ $app->get('/invesment/saldo', 'App\Controller\Investor:saldo');
 
 // User Routes
 $app->get('/users/info', 'App\Controller\Users:info');
+$app->get('/users/profile', 'App\Controller\Users:profile');

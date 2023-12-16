@@ -31,7 +31,7 @@ final class Users
         $this->general      = new General($container);
         $this->log          = new LogModel($this->container->get('db'));
         $this->file         = new FileModel($this->container->get('db'));
-        $this->account      = new AccountModel($this->container->get('db'));
+        $this->account      = new AccountModel($this->container);
         $this->user         = $this->auth->validateToken();
     }
 
@@ -53,6 +53,22 @@ final class Users
 
         $roles      = $this->user->role;
         $result     = $this->general->menuBar($roles);
+        
+        return JsonResponse:: withJson($response, $result, 200);
+    }
+
+    public function profile(Request $request, Response $response): Response {
+        $detail = $this->account->fetchById($this->user->id, 'users');
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan!'];
+
+        if (!empty($detail)) {
+            $dataUser = $this->account->fetchWhere(['id_user' => $this->user->id], $this->user->role, 'WHERE', 'FIRST');
+            if (!empty($dataUser) && $this->user->role == 'investor') {
+                $balance = $this->account->fetchWhere(['id_investor' => $dataUser->id], 'saldo_investor', 'WHERE', 'FIRST');
+                $dataUser->balance = !empty($balance) ? $balance->nominal : 0;
+            }
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $dataUser];
+        }
         
         return JsonResponse:: withJson($response, $result, 200);
     }
