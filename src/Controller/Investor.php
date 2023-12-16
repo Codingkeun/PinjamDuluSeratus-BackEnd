@@ -242,4 +242,14 @@ final class Investor
 
     }
 
+    public function saldo(Request $request, Response $response, $parameters): Response
+    {
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan'];
+        $saldo = $this->investor->checkSaldo($this->user->id, 'saldo_investor');
+
+        if (!empty($detail)) {
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $saldo];
+        }
+        return JsonResponse::withJson($response, $result, 200);
+    }
 }
