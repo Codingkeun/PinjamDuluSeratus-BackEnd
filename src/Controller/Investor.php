@@ -74,42 +74,32 @@ final class Investor
         $data['attachment']   = isset($files["attachment"]) ? $files["attachment"] :'';
         $data['created_at']   = date('Y-m-d H:i:s');
 
-        if (isset($_FILES['attachment']) && $_FILES['attachment']['size'] != 0) {
-            $targetFolder   = "/approval_pinjaman";
-            $validateFile   = $this->file->validateFile('attachment', $targetFolder, true);
+        // PENGECEKAN SALDO
+        $saldoCheck = $this->investor->checkSaldo($this->user->id, 'saldo_investor');
+        if(!empty($saldoCheck) && $saldoCheck->nominal >= $data['nominal']){
+            $prosesData = $this->generalModel->insert("transaction", $data);
+            if($prosesData){
+                $updateData['status_approval'] = 'approve';
+                $this->generalModel->update($idPinjaman, 'request_pinjaman', $updateData);
 
-            if ($validateFile['status']) {
-                $allowed_extension = array('png','jpg');
-                if (in_array($validateFile['extension'], $allowed_extension)) {
-                    $uploadedFiles  = $request->getUploadedFiles();
-                    $uploadedFile   = $uploadedFiles['attachment'];
+                $updateSaldo['nominal'] = $saldoCheck->nominal -  $data['nominal'];
+                $this->generalModel->update($saldoCheck->id, 'saldo_investor', $updateSaldo);
 
-                    if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-                        $filename       = $this->file->moveUploadedFile($uploadedFile, 'attachment');
-                        $url_upload     = $this->general->baseUrl($filename);
-
-                        $data["attachment"]    = $url_upload;
-                    }
-                } else {
-                    $allowSubmit = false;
-                    $result['error']        = "File yang diupload harus gambar (.png / .jpg)";
-                }
+                $result['status']  = true;
+                $result['message'] = 'Pengajuan Berhasil di Setujui';
+            }else{
+                $result['status']  = true;
+                $result['message'] = 'Pengajuan Gagal di Setujui';
             }
-        }
-        $prosesData = $this->generalModel->insert("transaction", $data);
-        if($prosesData){
-            $updateData['status_approval'] = 'approve';
-            $this->generalModel->update($idPinjaman, 'request_pinjaman', $updateData);
-
-            $result['status']  = true;
-            $result['message'] = 'Pengajuan Berhasil di Setujui';
         }else{
-            $result['status']  = true;
-            $result['message'] = 'Pengajuan Gagal di Setujui';
+            $result['status']  = false;
+            $result['message'] = 'Saldo Tidak Cukup, silahkan Topup';
         }
+        // PENGECEKAN SALDO
+
+        
         
         return JsonResponse:: withJson($response, $result, 200);
-
     }
 
     public function listPengajuanAktif(Request $request, Response $response): Response
