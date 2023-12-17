@@ -63,6 +63,7 @@ final class Users
 
         if (!empty($detail)) {
             $dataUser = $this->account->fetchWhere(['id_user' => $this->user->id], $this->user->role, 'WHERE', 'FIRST');
+            $dataUser->email = $detail->email;
             if (!empty($dataUser) && $this->user->role == 'investor') {
                 $balance = $this->account->fetchWhere(['id_investor' => $dataUser->id], 'saldo_investor', 'WHERE', 'FIRST');
                 $dataUser->balance = !empty($balance) ? $balance->nominal : 0;
