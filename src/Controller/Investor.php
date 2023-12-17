@@ -13,6 +13,7 @@ use App\Helper\JsonResponse;
 use App\Helper\General;
 use App\Model\AuthModel;
 use App\Model\PinjamanModel;
+use App\Model\InvestorModel;
 use App\Model\GeneralModel;
 use Pimple\Psr11\Container;
 use App\Model\LogModel;
@@ -179,13 +180,63 @@ final class Investor
         $post              = $request->getParsedBody();
 
         $saldoCheck = $this->investor->checkSaldo($this->user->id, 'saldo_investor');
+        $dataInvestor = $this->investor->fetchWhere(['id_user' => $this->user->id], 'investor', 'WHERE', 'FIRST');
+
+        if (!empty($dataInvestor)) {
+            $data   = [
+                'id_investor' => $dataInvestor->id,
+                'nominal' => $post['nominal'],
+                'payment_method_id' => $post['payment_method_id'],
+                'siklus' => 'masuk',
+                'description' => 'Topup Saldo',
+                'status' => 'wait',
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+    
+            $prosesData = $this->generalModel->insert('transaction', $data);
+            if($prosesData){
+                if (!empty($saldoCheck)) {
+                    $dataSaldo   = [
+                        'id_investor' => $dataInvestor->id,
+                        'nominal' => $saldoCheck->nominal + $post['nominal'],
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ];
+                    $this->investor->updateSaldo($dataInvestor->id, 'saldo_investor', $dataSaldo);
+                }else{
+                    $dataSaldo   = [
+                        'id_investor' => $dataInvestor->id,
+                        'nominal' => $post['nominal'],
+                        'created_at' => date('Y-m-d H:i:s')
+                    ];
+                    $this->generalModel->insert('saldo_investor', $dataSaldo);
+                }
+                $result['status']  = true;
+                $result['message'] = 'Topup Saldo berhasil dilakukan';
+            }else{
+                $result['status']  = true;
+                $result['message'] = 'Topup Saldo gagal dilakukan';
+            }
+        }
+        
+        return JsonResponse:: withJson($response, $result, 200);
+
+    }
+
+    public function confirmTopup(Request $request, Response $response): Response
+    {
+        $result         = array('status' => false, 'message' => 'Pembayaran gagal dilakukan');
+        
+        $post              = $request->getParsedBody();
+
+        $saldoCheck = $this->investor->checkSaldo($this->user->id, 'saldo_investor');
         $allowSubmit = true;
         $data   = [
             'id_investor' => $this->user->id,
             'nominal' => $post['nominal'],
+            'payment_method_id' => $post['payment_method_id'],
             'siklus' => 'masuk',
             'deskripsi' => 'Topup Saldo',
-            'status' => 'success',
+            'status' => 'pending',
             'created_at' => date('Y-m-d H:i:s')
         ];
 
