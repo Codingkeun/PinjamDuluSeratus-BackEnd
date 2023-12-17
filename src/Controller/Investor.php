@@ -179,10 +179,10 @@ final class Investor
         
         $post              = $request->getParsedBody();
 
-        $saldoCheck = $this->investor->checkSaldo($this->user->id, 'saldo_investor');
         $dataInvestor = $this->investor->fetchWhere(['id_user' => $this->user->id], 'investor', 'WHERE', 'FIRST');
 
         if (!empty($dataInvestor)) {
+            $saldoCheck = $this->investor->checkSaldo($dataInvestor->id, 'saldo_investor');
             $data   = [
                 'id_investor' => $dataInvestor->id,
                 'nominal' => $post['nominal'],
