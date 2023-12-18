@@ -33,6 +33,7 @@ final class Investor
         $this->generalModel  = new GeneralModel($this->container->get('db'));
         $this->general       = new General($container);
         $this->investor      = new InvestorModel($this->container);
+        $this->pinjaman      = new PinjamanModel($this->container);
         $this->log           = new LogModel($this->container->get('db'));
         $this->file          = new FileModel($this->container->get('db'));
         $this->user          = $this->auth->validateToken();
@@ -61,44 +62,51 @@ final class Investor
 
     public function approvePinjaman(Request $request, Response $response): Response
     {
-        $result         = array('status' => false, 'message' => 'Data gagal disimpan');
+        $result         = array('status' => false, 'message' => 'Pemberian pinjaman gagal dilakukan', 'must_topup' => false);
         
         $post                 = $request->getParsedBody();  
         $idPinjaman           = $post["id"];
+        $detailInvestor       = $this->investor->fetchWhere(['id_user' => $this->user->id], 'investor', 'WHERE', 'FIRST');
+        $detailTrx            = $this->investor->fetchById($idPinjaman, 'request_pinjaman');
 
-        $data['id_investor']  = $this->user->id;
-        $data['id_request_pinjaman']  = $idPinjaman;
-        $data['nominal']      = isset($post["nominal"]) ? $post["nominal"] :'';
-        $data['siklus']       = 'masuk';
-        $data['status']       = 'success';
-        $data['description']  = 'peminjaman dana';
-        $data['attachment']   = isset($files["attachment"]) ? $files["attachment"] :'';
-        $data['created_at']   = date('Y-m-d H:i:s');
+        if (!empty($detailInvestor)) {
+            $data['id_investor']  = $detailInvestor->id;
+            $data['id_request_pinjaman']  = $idPinjaman;
+            $data['nominal']      = $detailTrx->nominal;
+            $data['siklus']       = 'keluar';
+            $data['status']       = 'success';
+            $data['description']  = 'peminjaman dana';
+            $data['attachment']   = isset($files["attachment"]) ? $files["attachment"] :'';
 
-        // PENGECEKAN SALDO
-        $saldoCheck = $this->investor->checkSaldo($this->user->id, 'saldo_investor');
-        if(!empty($saldoCheck) && $saldoCheck->nominal >= $data['nominal']){
-            $prosesData = $this->generalModel->insert("transaction", $data);
-            if($prosesData){
-                $updateData['status_approval'] = 'approve';
-                $this->generalModel->update($idPinjaman, 'request_pinjaman', $updateData);
-
-                $updateSaldo['nominal'] = $saldoCheck->nominal -  $data['nominal'];
-                $this->generalModel->update($saldoCheck->id, 'saldo_investor', $updateSaldo);
-
-                $result['status']  = true;
-                $result['message'] = 'Pengajuan Berhasil di Setujui';
-            }else{
-                $result['status']  = true;
-                $result['message'] = 'Pengajuan Gagal di Setujui';
+            $currDate = date('Y-m-d H:i:s');
+    
+            // PENGECEKAN SALDO
+            $saldoCheck = $this->investor->checkSaldo($detailInvestor->id, 'saldo_investor');
+            if(!empty($saldoCheck) && $saldoCheck->nominal >= $data['nominal']){
+                $data['created_at']   = $currDate;
+                $prosesData = $this->generalModel->insert("transaction", $data);
+                if($prosesData){
+                    $updateData['status_approval'] = 'approve';
+                    $updateData['updated_at'] = $currDate;
+                    $this->generalModel->update($idPinjaman, 'request_pinjaman', $updateData);
+    
+                    $updateSaldo['nominal'] = $saldoCheck->nominal -  $data['nominal'];
+                    $updateSaldo['updated_at'] = $currDate;
+                    $this->generalModel->update($saldoCheck->id, 'saldo_investor', $updateSaldo);
+    
+                    $result['status']  = true;
+                    $result['message'] = 'Pengajuan Berhasil di Setujui';
+                } else {
+                    $result['status']  = false;
+                    $result['message'] = 'Pengajuan Gagal di Setujui';
+                }
+            } else {
+                $result['status']  = false;
+                $result['message'] = 'Saldo Tidak Cukup, silahkan Topup terlebih dahulu';
+                $result['must_topup'] = true;
             }
-        }else{
-            $result['status']  = false;
-            $result['message'] = 'Saldo Tidak Cukup, silahkan Topup';
+            // PENGECEKAN SALDO
         }
-        // PENGECEKAN SALDO
-
-        
         
         return JsonResponse:: withJson($response, $result, 200);
     }
@@ -310,6 +318,17 @@ final class Investor
 
         if (!empty($detail)) {
             $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $saldo];
+        }
+        return JsonResponse::withJson($response, $result, 200);
+    }
+
+    public function detailPengajuanPinjaman(Request $request, Response $response, $parameters): Response
+    {
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan'];
+        $detail = (array) $this->pinjaman->detail($parameters['id']);
+
+        if (!empty($detail)) {
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $detail];
         }
         return JsonResponse::withJson($response, $result, 200);
     }

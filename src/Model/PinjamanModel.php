@@ -40,7 +40,7 @@ final class PinjamanModel extends BaseModel
             
             $getQuery->orderBy($tmpSort[0], $tmpSort[1]);
         } if (empty($params['sort'])) {
-            $getQuery->orderBy('request_pinjaman.deadline', 'asc');
+            $getQuery->orderBy('request_pinjaman.created_at', 'desc');
         }
 
         return $getQuery;
@@ -97,13 +97,21 @@ final class PinjamanModel extends BaseModel
                                     ->where('id_request_pinjaman', $id)
                                     ->where('status', '!=', 'belum')
                                     ->orderBy('id', 'asc')
-                                    ->count();;
+                                    ->count();
             $trxUnPaid = $this->getListTrxUnpaid($id);
             $getInvestor = $this->db()->table('transaction')
-                                    ->select($this->db()->raw('investor.name'))
+                                    ->select($this->db()->raw('investor.name, users.email, investor.phone'))
                                     ->join('investor', 'investor.id', '=', 'transaction.id_investor')
+                                    ->join('users', 'investor.id_user', '=', 'users.id')
+                                    ->where('id_request_pinjaman', $id)
+                                    ->first();
+            $getBorrower = $this->db()->table('peminjam')
+                                    ->select($this->db()->raw('peminjam.*, users.email'))
+                                    ->join('users', 'users.id', '=', 'peminjam.id_user')
+                                    ->where('peminjam.id', $result->id_peminjam)
                                     ->first();
 
+            $result->borrower = $getBorrower;
             $result->investor = $getInvestor;
             $result->count_payment = $totalTrxPaid + 1;
             $result->trx_unpaid = $trxUnPaid;

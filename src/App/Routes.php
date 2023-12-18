@@ -26,6 +26,7 @@ $app->post('/invesment/approve-pinjaman', 'App\Controller\Investor:approvePinjam
 $app->get('/invesment/pinjaman-aktif', 'App\Controller\Investor:listPengajuanAktif'); 
 $app->get('/invesment/piutang-aktif', 'App\Controller\Investor:listPiutangAktif'); 
 $app->get('/invesment/detail/{id}', 'App\Controller\Investor:detail'); 
+$app->get('/invesment/detail/pengajuan/{id}', 'App\Controller\Investor:detailPengajuanPinjaman'); 
 $app->get('/invesment/riwayat', 'App\Controller\Investor:riwayatPinjaman'); 
 $app->post('/invesment/topup', 'App\Controller\Investor:topup');
 $app->get('/invesment/topup/detail/{id}', 'App\Controller\Investor:detailTransaction');

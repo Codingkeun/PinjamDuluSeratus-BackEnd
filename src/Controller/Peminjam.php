@@ -166,7 +166,7 @@ final class Peminjam
             $allowSubmit = true;
             $data   = [
                 'status' => 'lunas',
-                'date_payment' => date('Y-m-d H:i:s'),
+                'date_payment' => $post['date'],
                 'payment_method_id' => $post['payment_method_id']
             ];
     
@@ -194,6 +194,7 @@ final class Peminjam
             }
     
             if ($allowSubmit) {
+                $data['updated_at'] = date('Y-m-d H:i:s');
                 $prosesData = $this->generalModel->update($post["trx_id"], 'request_pinjaman_cicilan', $data);
                 if($prosesData){
                     $result['status']  = true;
@@ -203,6 +204,34 @@ final class Peminjam
                     // flag the parent data if all tenor is paid
                     if (empty($currUnpaid)) {
                         $this->generalModel->update($detailTrx->id_request_pinjaman, 'request_pinjaman', ['instalment_status' => 'lunas']);
+
+                        // insert to transaction when paid
+                        $getTransaction = $this->pinjaman->fetchWhere(['id_request_pinjaman' => $detailTrx->id_request_pinjaman, 'siklus' => 'keluar', 'status' => 'success'], 'transaction', 'WHERE', 'FIRST');
+                        if (!empty($getTransaction)) {
+                            $dataTrx = [
+                                'id_investor' => $getTransaction->id_investor,
+                                'id_request_pinjaman' => $detailTrx->id_request_pinjaman,
+                                'nominal' => $getTransaction->nominal,
+                                'siklus' => 'masuk',
+                                'description' => 'Pelunasan dana pinjaman',
+                                'status' => 'success',
+                                'payment_method_id' => $post['payment_method_id'],
+                                'attachment' => $data["attachment"],
+                                'date_payment' => $post['date'],
+                                'created_at' => date('Y-m-d H:i:s')
+                            ];
+                            $processInsertTrx = $this->pinjaman->insert('transaction', $dataTrx);
+
+                            if ($processInsertTrx) {
+                                // add balance when loan is all paid
+                                $saldoCheck = $this->pinjaman->fetchWhere(['id_investor' => $getTransaction->id_investor], 'saldo_investor', 'WHERE', 'FIRST');
+                                if ($saldoCheck) {
+                                    $updateSaldo['nominal'] = $saldoCheck->nominal +  $getTransaction->nominal;
+                                    $updateSaldo['updated_at'] = date('Y-m-d H:i:s');
+                                    $this->generalModel->update($saldoCheck->id, 'saldo_investor', $updateSaldo);
+                                }
+                            }
+                        }
                     }
                 }
             }

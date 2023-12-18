@@ -23,8 +23,8 @@ final class InvestorModel extends BaseModel
     public function buildQueryPengajuan($params=null) {
         $getQuery = $this->db()->table('request_pinjaman');
         $getQuery->select($getQuery->raw('request_pinjaman.*, peminjam.name as peminjam_name, peminjam.npm as peminjam_npm, peminjam.phone as peminjam_phone'));
-        $getQuery->leftJoin('peminjam', 'investor.id', '=', 'request_pinjaman.id_peminjam');
-        $getQuery->where('request_pinjaman.stattus_approval', 'wait');
+        $getQuery->leftJoin('peminjam', 'peminjam.id', '=', 'request_pinjaman.id_peminjam');
+        $getQuery->where('request_pinjaman.status_approval', 'wait');
         $getQuery->groupBy('request_pinjaman.id');
 
         if(!empty($params['keywords'])) {
@@ -158,7 +158,7 @@ final class InvestorModel extends BaseModel
                             ->whereNull('transaction.id_request_pinjaman')
                             ->where('transaction.id_investor', $params['id_investor'])
                             ->where('transaction.siklus', 'masuk')
-                            ->orderBy('transaction.created_at', 'desc');
+                            ->orderBy('transaction.id', 'desc');
         return $getQuery;
     }
     
@@ -179,7 +179,7 @@ final class InvestorModel extends BaseModel
         foreach ($list as $item) {
             $date = new \DateTime($item->created_at);
             $item->deadline = $date->modify('+1 day')->format('Y-m-d H:i');
-            $item->expired = (strtotime($item->created_at) - time()) <= 0;
+            $item->expired = (strtotime($item->deadline) - strtotime('now')) <= 0;
         }
 
         return ['data' => $list, 'total' => $totalData];
