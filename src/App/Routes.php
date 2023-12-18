@@ -28,6 +28,9 @@ $app->get('/invesment/piutang-aktif', 'App\Controller\Investor:listPiutangAktif'
 $app->get('/invesment/detail/{id}', 'App\Controller\Investor:detail'); 
 $app->get('/invesment/riwayat', 'App\Controller\Investor:riwayatPinjaman'); 
 $app->post('/invesment/topup', 'App\Controller\Investor:topup');
+$app->get('/invesment/topup/detail/{id}', 'App\Controller\Investor:detailTransaction');
+$app->get('/invesment/topup/history', 'App\Controller\Investor:historyTopUp');
+$app->post('/invesment/topup/confirm', 'App\Controller\Investor:confirmTopup');
 $app->get('/invesment/saldo', 'App\Controller\Investor:saldo');
 
 // User Routes

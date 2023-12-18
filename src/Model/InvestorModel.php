@@ -151,4 +151,38 @@ final class InvestorModel extends BaseModel
         return $this->db()->table($table)->where('id_investor', $investor)->update($data);
     }
 
+    public function buildQueryHistoryTopUp($params) {
+        $getQuery = $this->db()->table('transaction')
+                            ->select($this->db()->raw('transaction.*, payment_method.bank_name, payment_method.account_number'))
+                            ->join('payment_method', 'payment_method.id', '=', 'transaction.payment_method_id')
+                            ->whereNull('transaction.id_request_pinjaman')
+                            ->where('transaction.id_investor', $params['id_investor'])
+                            ->where('transaction.siklus', 'masuk')
+                            ->orderBy('transaction.created_at', 'desc');
+        return $getQuery;
+    }
+    
+    public function listHistoryTopUp($params=null) {
+        $getQuery = $this->buildQueryHistoryTopUp($params);
+        
+        $totalData = $getQuery->count();
+
+        if (!empty($params['page'])) {
+            $page = $params['page'] == 1 ? $params['page'] - 1 : ($params['page'] * $params['limit']) - $params['limit'];
+
+            $getQuery->limit((int) $params['limit']);
+            $getQuery->offset((int) $page);
+        }
+
+        $list = $getQuery->get();
+
+        foreach ($list as $item) {
+            $date = new \DateTime($item->created_at);
+            $item->deadline = $date->modify('+1 day')->format('Y-m-d H:i');
+            $item->expired = (strtotime($item->created_at) - time()) <= 0;
+        }
+
+        return ['data' => $list, 'total' => $totalData];
+    }
+
 }

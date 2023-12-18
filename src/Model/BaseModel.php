@@ -58,6 +58,8 @@ abstract class BaseModel
                     $getQuery->whereIn($key, $item);
                 elseif ($type == "NOT_IN")
                     $getQuery->whereNotIn($key, $item);
+                elseif ($item === null)
+                    $getQuery->whereNull($key);
             }
         }
         

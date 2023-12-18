@@ -175,7 +175,7 @@ final class Investor
 
     public function topup(Request $request, Response $response): Response
     {
-        $result         = array('status' => false, 'message' => 'Pembayaran gagal dilakukan');
+        $result         = array('status' => false, 'message' => 'Topup Saldo gagal dilakukan');
         
         $post              = $request->getParsedBody();
 
@@ -195,50 +195,41 @@ final class Investor
     
             $prosesData = $this->generalModel->insert('transaction', $data);
             if($prosesData){
-                if (!empty($saldoCheck)) {
-                    $dataSaldo   = [
-                        'id_investor' => $dataInvestor->id,
-                        'nominal' => $saldoCheck->nominal + $post['nominal'],
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ];
-                    $this->investor->updateSaldo($dataInvestor->id, 'saldo_investor', $dataSaldo);
-                }else{
-                    $dataSaldo   = [
-                        'id_investor' => $dataInvestor->id,
-                        'nominal' => $post['nominal'],
-                        'created_at' => date('Y-m-d H:i:s')
-                    ];
-                    $this->generalModel->insert('saldo_investor', $dataSaldo);
-                }
-                $result['status']  = true;
-                $result['message'] = 'Topup Saldo berhasil dilakukan';
-            }else{
-                $result['status']  = true;
-                $result['message'] = 'Topup Saldo gagal dilakukan';
+                $result         = array('status' => true, 'message' => 'Topup Saldo berhasil dilakukan', 'data' => $prosesData);
             }
         }
         
         return JsonResponse:: withJson($response, $result, 200);
+    }
 
+    public function detailTransaction(Request $request, Response $response, $parameters): Response
+    {
+        $result         = array('status' => false, 'message' => 'Pembayaran gagal dilakukan');
+
+        $detail = $this->investor->fetchById($parameters['id'], 'transaction', 'WHERE', 'FIRST');
+        
+        if (!empty($detail)) {
+            $paymentMethod = $this->investor->fetchById($detail->payment_method_id, 'payment_method', 'WHERE', 'FIRST');
+            $detail->bank_name = !empty($paymentMethod) ? $paymentMethod->bank_name : '';
+            $detail->payment_method_account_number = !empty($paymentMethod) ? $paymentMethod->account_number : '';
+            $detail->time_remaining_in_millisecond = $this->general->millisecsBetween($detail->created_at, date('Y-m-d H:i:s'));
+            $result         = array('status' => true, 'message' => '', 'data' => $detail);
+        }
+
+        return JsonResponse:: withJson($response, $result, 200);
     }
 
     public function confirmTopup(Request $request, Response $response): Response
     {
-        $result         = array('status' => false, 'message' => 'Pembayaran gagal dilakukan');
+        $result         = array('status' => false, 'message' => 'Konfirmasi pembayaran gagal dilakukan');
         
         $post              = $request->getParsedBody();
 
-        $saldoCheck = $this->investor->checkSaldo($this->user->id, 'saldo_investor');
         $allowSubmit = true;
-        $data   = [
-            'id_investor' => $this->user->id,
-            'nominal' => $post['nominal'],
-            'payment_method_id' => $post['payment_method_id'],
-            'siklus' => 'masuk',
-            'deskripsi' => 'Topup Saldo',
-            'status' => 'pending',
-            'created_at' => date('Y-m-d H:i:s')
-        ];
+        $currDate = date('Y-m-d H:i:s');
+        $data   = ['status' => 'success', 'date_payment' => $post['date'], 'updated_at' => $currDate];
+
+        $detailTrx = $this->investor->fetchById($post['trx_id'], 'transaction');
 
         if (isset($_FILES['attachment']) && $_FILES['attachment']['size'] != 0) {
             $targetFolder   = "/topup";
@@ -264,33 +255,52 @@ final class Investor
         }
 
         if ($allowSubmit) {
-            $prosesData = $this->generalModel->insert('transaction', $data);
+            $saldoCheck = $this->investor->checkSaldo($detailTrx->id_investor, 'saldo_investor');
+            $prosesData = $this->generalModel->update($post['trx_id'], 'transaction', $data);
             if($prosesData){
                 if (!empty($saldoCheck)) {
                     $dataSaldo   = [
-                        'id_investor' => $this->user->id,
-                        'nominal' => $saldoCheck->nominal + $post['nominal'],
+                        'id_investor' => $detailTrx->id_investor,
+                        'nominal' => $saldoCheck->nominal + $detailTrx->nominal,
                         'updated_at' => date('Y-m-d H:i:s')
                     ];
-                    $this->investor->updateSaldo($this->user->id, 'saldo_investor', $dataSaldo);
+                    $this->investor->updateSaldo($detailTrx->id_investor, 'saldo_investor', $dataSaldo);
                 }else{
                     $dataSaldo   = [
-                        'id_investor' => $this->user->id,
-                        'nominal' => $post['nominal'],
+                        'id_investor' => $detailTrx->id_investor,
+                        'nominal' => $detailTrx->nominal,
                         'created_at' => date('Y-m-d H:i:s')
                     ];
                     $this->generalModel->insert('saldo_investor', $dataSaldo);
                 }
                 $result['status']  = true;
-                $result['message'] = 'Topup Saldo berhasil dilakukan';
-            }else{
-                $result['status']  = true;
-                $result['message'] = 'Topup Saldo gagal dilakukan';
+                $result['message'] = 'Saldo berhasil ditambahkan';
             }
         }
         
         return JsonResponse:: withJson($response, $result, 200);
 
+    }
+
+    public function historyTopUp(Request $request, Response $response, $parameters): Response
+    {
+        $params = $request->getQueryParams();
+        $result = ['status' => false, 'message' => 'Data tidak ditemukan'];
+        $dataUser = $this->investor->fetchWhere(['id_user' => $this->user->id], 'investor', 'WHERE', 'FIRST');
+        $list = [];
+
+        if (!empty($dataUser)) {
+            $params['id_investor'] = $dataUser->id;
+            $list = $this->investor->listHistoryTopUp($params);
+            $result = ['status' => true, 'message' => 'Data ditemukan', 'data' => $list];
+        }
+        $result['pagination'] = [
+            'page' => (int) $params['page'],
+            'prev' => $params['page'] > 1,
+            'next' => ($list['total'] - ($params['page'] * $params['limit'])) > 0,
+            'total' => $list['total']
+        ];
+        return JsonResponse::withJson($response, $result, 200);
     }
 
     public function saldo(Request $request, Response $response, $parameters): Response
